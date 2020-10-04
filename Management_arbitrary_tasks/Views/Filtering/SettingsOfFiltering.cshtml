@@ -1,0 +1,212 @@
+﻿@model Management_arbitrary_tasks.Models.FilteringModel
+
+@{
+    ViewBag.Title = " - Фильтрация";
+}
+
+<h3>Настройки Фильтрации и Сортировки</h3>
+
+<span style="font-size:18px">
+
+@using (Html.BeginForm("SettingsOfFiltering", "Filtering", FormMethod.Post, new { @onsubmit = "FillingOrderOfFields()" }))
+{
+<table>
+    <tr>
+        <td>
+            <table border="1">
+                <tr>
+                    <td colspan="4" style="background-color:yellow">
+                        <center><b>Период создания заявки</b></center>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                    <p>
+                    С:<input type="date" name="SearchingRequest.CreatedDate_Begin" 
+                               value=
+                               "@if (Model.SearchingRequest.CreatedDate_Begin != null)
+                               {
+                                   @Model.SearchingRequest.CreatedDate_Begin.Value.ToString("yyyy-MM-dd");
+                               }
+                               else
+                               {
+                                   //@(new DateTime(0).ToString("yyyy-MM-dd"));
+                                   @(" ");
+                               }" 
+                               style="font-size:18px;width:35%">
+                    ПО:<input type="date" name="SearchingRequest.CreatedDate_End"
+                               value="@if (Model.SearchingRequest.CreatedDate_End != null)
+                               {
+                                   @Model.SearchingRequest.CreatedDate_End.Value.ToString("yyyy-MM-dd");
+                               }
+                               else
+                               {
+                                   @(" ");
+                               }"
+                               style="font-size:18px;width:35%">
+                    </p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td rowspan="2" style="vertical-align:top">
+            <table width="500px" cellpadding="0" cellspacing="0" border="3" style="border-color:black">
+                <tr>
+                    <td colspan="2" style="background-color:yellow">
+                        <center><b>Фильтрация по статусам заявки</b></center>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <table cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td width="100px" align="center">Статусы</td>
+                                <td>
+                                    @foreach(var cStatus in Model.AllStatuses)
+                                    {
+                                        <div class="checkbox">
+                                            <input type="checkbox" name="SearchingRequest.SelectedStatuses" value="@cStatus.Value"
+                                                @if (Model.SearchingRequest.Statuses.Contains(cStatus.Value))
+                                                {
+                                                    <text> checked </text>
+                                                }
+                                                />@cStatus.Caption
+                                        </div>
+                                    }
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <table width="500px" cellpadding="0" cellspacing="0" border="3" style="border-color:black">
+                <tr>
+                    <td colspan="2" style="background-color:yellow">
+                        <center><b>Фильтрация по периоду последнего обновления заявки</b></center>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Начало периода:</td>
+                    <td><input type="date" name="SearchingRequest.UpdatingDate_Begin" 
+                               value=
+                               "@if (Model.SearchingRequest.UpdatingDate_Begin != null)
+                               {
+                                   @Model.SearchingRequest.UpdatingDate_Begin.Value.ToString("yyyy-MM-dd");
+                               }
+                               else
+                               {
+                                   @(" ");
+                               }" 
+                               style="font-size:18px;width:98%">
+                    </td>
+                </tr>
+                <tr>
+                    <td>Окончание период:</td>
+                    <td><input type="date" name="SearchingRequest.UpdatingDate_End" 
+                               value=
+                               "@if (Model.SearchingRequest.UpdatingDate_End != null)
+                               {
+                                   @Model.SearchingRequest.UpdatingDate_End.Value.ToString("yyyy-MM-dd");
+                               }
+                               else
+                               {
+                                   @(" ");
+                               }" 
+                               style="font-size:18px;width:98%">
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <table width="500px" cellpadding="0" cellspacing="0" border="3" style="border-color:black">
+                <tr>
+                    <td colspan="2" style="background-color:yellow">
+                        <center><b>Порядок сортировки полей списка заявок</b></center>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <table cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td>
+                                    @Html.ListBox("AllFieldsOfTask", new SelectList(Model.AllFieldsOfTask, "Name", "Caption"), new { @Id = "AllFieldsOfTask", @style = "width:200px; height:150px;", @Size = "1" } )
+                                </td>
+                                <td style="vertical-align:central">
+                                    <input type="button" value="Вверх" onclick="Up()" style="width:60px" /><br />
+                                    <input type="button" value="Вниз" onclick="Down()" style="width:60px" />
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <input type="submit" class="btn btn-primary" value= "Применить" />
+            <p></p>
+            @Html.ActionLink("К Списоку задач", "TasksList", "Tasks")
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <span style="color:red">@Model.ErrorMessage</span>
+        </td>
+    </tr>
+</table>
+<div style="visibility:hidden">
+    <select Id="OrderOfFields" name="SearchingRequest.OrderOfFields" multiple="multiple"></select>
+</div>
+}
+</span>
+
+<script type="text/javascript">
+
+    function FillingOrderOfFields() {
+        var optionsField = document.getElementById("AllFieldsOfTask").options;
+        var orderOfFields = document.getElementById("OrderOfFields");
+        for (var i = 0; i < optionsField.length; i++) {
+            orderOfFields.add(new Option(optionsField[i].text, optionsField[i].value, true, true));
+        }
+    }
+
+    function Up() {
+        var options = document.getElementById("AllFieldsOfTask").options;
+        for (var i = 1; i < options.length; i++) {
+            if (options[i].selected) {
+                ExchangeOfOptions(options[i], options[i - 1]);
+                break;
+            }
+        }
+    }
+
+    function Down() {
+        var options = document.getElementById("AllFieldsOfTask").options;
+        for (var i = 0; i < (options.length - 1) ; i++) {
+            if (options[i].selected) {
+                ExchangeOfOptions(options[i], options[i + 1]);
+                break;
+            }
+        }
+    }
+
+    function ExchangeOfOptions(source, recipient) {
+        var tmpText = recipient.text;
+        var tmpValue = recipient.value;
+        recipient.text = source.text;
+        recipient.value = source.value;
+        recipient.selected = true;
+        source.text = tmpText;
+        source.value = tmpValue;
+        source.selected = false;
+    }
+
+</script>

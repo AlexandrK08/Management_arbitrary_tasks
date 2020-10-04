@@ -1,0 +1,15 @@
+﻿@model Management_arbitrary_tasks.Models.ResultEventModel
+
+@{
+    ViewBag.Title = " - Результат";
+}
+
+<h3>@Model.CaptionOfEvent</h3>
+
+<p>
+    <span style="font-size:18px;background-color:gray;color:yellow">@Model.MessageOfResult</span>
+</p>
+
+<p>
+    <span style="font-size:20px">@Html.ActionLink("К Списоку задач", "TasksList", "Tasks")</span>
+</p>

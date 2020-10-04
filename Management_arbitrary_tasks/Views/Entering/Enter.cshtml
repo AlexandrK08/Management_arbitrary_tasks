@@ -1,0 +1,30 @@
+﻿@model Management_arbitrary_tasks.Models.EnterModel
+
+@{
+    ViewBag.Title = " - Вход";
+}
+
+<h3 style="text-align:center">Вход</h3>
+
+@if (Model.CurrentUser.ID != 0)
+{
+    <p><b>Текущий пользователь: @Model.CurrentUser.Name</b></p>
+}
+
+<center>
+    @using (Html.BeginForm())
+    {
+        <table cellpadding="5" cellspacing="0" border="0" style="border-color:black">
+            <tr>
+                <td><span style="font-size:18px">Пользователь:</span></td>
+                <td>
+                    @Html.DropDownListFor(
+                    m => m.CurrentUserID,
+                    from u in Model.Users select new SelectListItem() { Text = u.Name, Value = u.ID.ToString() })
+                </td>
+                <td><input type="submit" value="Войти" /></td>
+                <td><span style="color:red">@Model.ErrorMessage</span></td>
+            </tr>
+        </table>
+    }
+</center>

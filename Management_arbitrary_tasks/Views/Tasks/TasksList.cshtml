@@ -1,0 +1,92 @@
+﻿@model Management_arbitrary_tasks.Models.ListModel
+
+@{
+    ViewBag.Title = " - Список задач";
+}
+
+<h3 style="text-align:center">Список задач</h3>
+
+<table width="100%">
+    <tr>
+        <td><b>Текущий пользователь: @Model.CurrentUser.Name</b></td>
+        <td align="right">@Html.ActionLink("Выход", "Exit", "Entering")</td>
+    </tr>
+</table>
+
+<p>
+    <span style="font-size:20px">
+        @Html.ActionLink("Добавить задачу", "AddTask", "TaskChange")
+        &nbsp;&nbsp;|&nbsp;&nbsp;
+        @Html.ActionLink("Фильтровать (и Сортировать)", "SettingsOfFiltering", "Filtering")
+        &nbsp;&nbsp;|&nbsp;&nbsp;
+        @Html.ActionLink("Сбросить фильтр", "ResetFilter", "Filtering")
+    </span>
+</p>
+
+<center>
+    <table cellpadding="5" cellspacing="0" border="3" style="border-color:black">
+        <thead>
+            <tr>
+                <th>№ п/п</th>
+                <th>@Html.ConvertingNameOfFieldToCaption("ID")</th>
+                <th width="150px">@Html.ConvertingNameOfFieldToCaption("Caption")</th>
+                <th width="130px">@Html.ConvertingNameOfFieldToCaption("CreateDate")</th>
+                <th width="130px">@Html.ConvertingNameOfFieldToCaption("CreateUser")</th>
+                <th width="130px">@Html.ConvertingNameOfFieldToCaption("LastUpdateDate")</th>
+                <th width="130px">@Html.ConvertingNameOfFieldToCaption("LastUpdateUser")</th>
+                <th width="100px">@Html.ConvertingNameOfFieldToCaption("Status")</th>
+                <th>Доступные действия</th>
+            </tr>
+        </thead>
+        @{
+            UInt32 number = 0;
+            foreach (Task_Queries cTask in Model.Tasks)
+            {
+                <tr>
+                    <td align="center">@(++number)</td>
+                    <td align="center">@cTask.ID</td>
+                    <td>@cTask.Caption</td>
+                    <td>@cTask.CreateDate.ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>@cTask.CreateUser.Name</td>
+                    <td>@cTask.LastUpdateDate.ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>@cTask.LastUpdateUser.Name</td>
+                    <td style="background-color:@Html.ConvertingStatusToColor(cTask.Status.Value)">@cTask.Status.Caption</td>
+                    <td>
+                        @if ((Model.AvailableActions[cTask.ID] & 2) == 2)
+                        {
+                            @Html.ManagementLink("Взять ", Url.Action("TakingTask", "TaskChange", new { taskID = cTask.ID }))
+                        }
+                        @if ((Model.AvailableActions[cTask.ID] & 4) == 4)
+                        {
+                            @Html.ManagementLink("Забрать ", Url.Action("ReassignedTask", "TaskChange", new { taskID = cTask.ID }))
+                        }
+                        @if ((Model.AvailableActions[cTask.ID] & 8) == 8)
+                        {
+                            @Html.ManagementLink("Решить ", Url.Action("SolutionTask", "TaskChange", new { taskID = cTask.ID }))
+                        }
+                        @if ((Model.AvailableActions[cTask.ID] & 16) == 16)
+                        {
+                            @Html.ManagementLink("Закрыть ", Url.Action("ClosingTask", "TaskChange", new { taskID = cTask.ID }))
+                        }
+                        @if ((Model.AvailableActions[cTask.ID] & 32) == 32)
+                        {
+                            @Html.ManagementLink("Вернуть ", Url.Action("ReturnTask", "TaskChange", new { taskID = cTask.ID }))
+                        }
+                        @if ((Model.AvailableActions[cTask.ID] & 64) == 64)
+                        {
+                            @Html.ManagementLink("Комментировать ", Url.Action("CommentingTask", "TaskChange", new { taskID = cTask.ID }))
+                        }
+                        @if ((Model.AvailableActions[cTask.ID] & 128) == 128)
+                        {
+                            @Html.ManagementLink("Просмотреть ", Url.Action("ViewTask", "TaskChange", new { taskID = cTask.ID }))
+                        }
+                        @if ((Model.AvailableActions[cTask.ID] & 256) == 256)
+                        {
+                            @Html.ManagementLink("Удалить ", Url.Action("DeleteTask", "TaskChange", new { taskID = cTask.ID }))
+                        }
+                    </td>
+                </tr>
+            }
+        }
+    </table>
+</center>

@@ -1,0 +1,127 @@
+﻿@model Management_arbitrary_tasks.Models.TaskChangeModel
+
+@{
+    ViewBag.Title = String.Format(" - Заявка {0}", Model.NameEvent == "AddTask" ? "Новая" : Model.CurrentTask.ID.ToString());
+}
+
+<h3 style="text-align:center">Заявка
+    @if(Model.NameEvent == "AddTask")
+    {
+@:Добавление
+    }</h3>
+
+<p><b>Текущий пользователь: @Model.CurrentUser.Name</b></p>
+
+@if (Model.NameEvent != "AddTask")
+{
+    <center>
+        <table cellpadding="5" cellspacing="0" border="3" style="border-color:black">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th width="150px">@Html.ConvertingNameOfFieldToCaption("Caption")</th>
+                    <th width="130px">@Html.ConvertingNameOfFieldToCaption("CreateDate")</th>
+                    <th width="130px">@Html.ConvertingNameOfFieldToCaption("CreateUser")</th>
+                    <th width="130px">@Html.ConvertingNameOfFieldToCaption("LastUpdateDate")</th>
+                    <th width="130px">@Html.ConvertingNameOfFieldToCaption("LastUpdateUser")</th>
+                    <th width="100px">@Html.ConvertingNameOfFieldToCaption("Status")</th>
+                </tr>
+            </thead>
+            <tr>
+                <td align="center">@Model.CurrentTask.ID</td>
+                <td align="center">@Model.CurrentTask.Caption</td>
+                <td>@Model.CurrentTask.CreateDate.ToString("dd.MM.yyyy HH:mm")</td>
+                <td>@Model.CurrentTask.CreateUser.Name</td>
+                <td>@Model.CurrentTask.LastUpdateDate.ToString("dd.MM.yyyy HH:mm")</td>
+                <td>@Model.CurrentTask.LastUpdateUser.Name</td>
+                <td style="background-color:@Html.ConvertingStatusToColor(@Model.CurrentTask.Status.Value)">@Model.CurrentTask.Status.Caption</td>
+            </tr>
+        </table>
+    </center>
+
+    <h3 style="text-align:center">История изменения заявки</h3>
+
+    <center>
+        <table cellpadding="5" cellspacing="0" border="3" style="border-color:black">
+            <thead>
+                <tr>
+                    <th>@Html.ConvertingNameOfFieldToCaption("DateChange")</th>
+                    <th>@Html.ConvertingNameOfFieldToCaption("CreateUser")</th>
+                    <th>@Html.ConvertingNameOfFieldToCaption("Status")</th>
+                    <th>@Html.ConvertingNameOfFieldToCaption("Comment")</th>
+                </tr>
+            </thead>
+            @{
+                foreach(TaskChange_Queries cChange in Model.TaskChanges)
+                {
+                    <tr>
+                        <td>@cChange.DateChange.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td>@cChange.CreateUser.Name</td>
+                        <td style="background-color:@Html.ConvertingStatusToColor(cChange.Status.Value)">@cChange.Status.Caption</td>
+                        <td>@cChange.Comment</td>
+                    </tr>
+                }
+             }
+        </table>
+    </center>
+}
+
+<p></p>
+
+<center>
+    @using (Html.BeginForm())
+    {
+        @Html.TextBoxFor(m => m.CurrentTaskID, new { @type = "hidden" })
+        <table cellpadding="5" cellspacing="0" border="3" style="border-color:black">
+            @if (Model.NameEvent == "AddTask")
+            {
+                <tr>
+                    <td align="center">
+                        <span style="font-size:18px"><b>Заголовок новой заявки (обязателен для заполнения)</b></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.TextAreaFor(m => m.Caption, new { @cols = "100", @rows = "1", @style = "resize: none;" })
+                    </td>
+                </tr>
+            }
+            @if (Model.NameEvent != "ViewTask")
+            {
+                <tr>
+                    <td align="center">
+                        <span style="font-size:18px"><b>Комментарий (обязателен для заполнения)</b></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.TextAreaFor(m => m.Comment, new { @cols = "100", @rows = "5", @style = "resize: none;" })
+                    </td>
+                </tr>
+                <tr>
+                    <td align="left">
+                        <input type="submit" class="btn btn-primary" value= "@Html.ConvertingNameEventToCaption(Model.NameEvent)"/>
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td>
+                    @Html.ActionLink("К Списоку задач", "TasksList", "Tasks")
+                </td>
+            </tr>
+            @foreach (String currentError in Model.ErrorMessages)
+            {
+                <tr>
+                    <td>
+                        <span style="color:red">@currentError</span>
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td>
+                    <span style="color:red">@Html.ValidationSummary()</span>
+                </td>
+            </tr>
+        </table>
+    }
+</center>
